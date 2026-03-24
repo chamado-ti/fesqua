@@ -38,23 +38,39 @@
     justify-content: center;
     align-items: center;
     z-index: 1;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   #botao {
     background: white;
     color: black;
-    padding: 25px 40px;
-    font-size: 26px;
+    padding: 25px 30px;
+    font-size: 24px;
     border-radius: 15px;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 0 20px rgba(255,255,255,0.6);
+    text-align: center;
+
+    width: 85%;
+    max-width: 350px;
+
+    box-shadow: 0 0 25px rgba(255,255,255,0.7);
     animation: pulse 1.5s infinite;
+  }
+
+  @media (max-width: 600px) {
+    #botao {
+      font-size: 26px;
+      padding: 30px 20px;
+      width: 95%;
+      border-radius: 18px;
+    }
   }
 
   @keyframes pulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+    50% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
 </style>
@@ -75,13 +91,15 @@
 <script>
   const video = document.getElementById('video');
   const startScreen = document.getElementById('startScreen');
+  const particlesCanvas = document.getElementById('particles');
 
   document.getElementById('botao').addEventListener('click', () => {
     startScreen.style.display = 'none';
-    document.getElementById('particles').style.display = 'none';
+    particlesCanvas.style.display = 'none';
 
     video.style.display = 'block';
     video.muted = false;
+
     video.play();
 
     if (video.requestFullscreen) {
@@ -92,33 +110,41 @@
   });
 
   // ===== PARTÍCULAS =====
-  const canvas = document.getElementById("particles");
-  const ctx = canvas.getContext("2d");
+  const ctx = particlesCanvas.getContext("2d");
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  function resizeCanvas() {
+    particlesCanvas.width = window.innerWidth;
+    particlesCanvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
 
   let particles = [];
 
-  for (let i = 0; i < 80; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * 3,
-      speedX: (Math.random() - 0.5) * 1,
-      speedY: (Math.random() - 0.5) * 1
-    });
+  function createParticles() {
+    particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * particlesCanvas.width,
+        y: Math.random() * particlesCanvas.height,
+        size: Math.random() * 3,
+        speedX: (Math.random() - 0.5) * 1,
+        speedY: (Math.random() - 0.5) * 1
+      });
+    }
   }
 
+  createParticles();
+
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
 
     particles.forEach(p => {
       p.x += p.speedX;
       p.y += p.speedY;
 
-      if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+      if (p.x < 0 || p.x > particlesCanvas.width) p.speedX *= -1;
+      if (p.y < 0 || p.y > particlesCanvas.height) p.speedY *= -1;
 
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -132,8 +158,8 @@
   animate();
 
   window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    resizeCanvas();
+    createParticles();
   });
 </script>
 
