@@ -18,6 +18,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background: black;
   }
 
   #overlay {
@@ -33,28 +34,45 @@
     color: white;
     font-size: 20px;
     cursor: pointer;
+    z-index: 10;
   }
 </style>
 </head>
 
 <body>
 
-<div id="overlay">Toque para iniciar</div>
+<div id="overlay">🔊 Toque para iniciar</div>
 
-<video id="video">
+<video id="video" autoplay muted playsinline>
   <source src="video.mp4" type="video/mp4">
+  Seu navegador não suporta vídeo.
 </video>
 
 <script>
   const video = document.getElementById('video');
   const overlay = document.getElementById('overlay');
 
+  // garante que o vídeo carregue
+  video.load();
+
   overlay.addEventListener('click', () => {
     video.muted = false;
-    video.play();
 
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.log("Erro ao dar play:", error);
+      });
+    }
+
+    // fullscreen mais compatível
     if (video.requestFullscreen) {
       video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    } else if (video.msRequestFullscreen) {
+      video.msRequestFullscreen();
     }
 
     overlay.style.display = 'none';
